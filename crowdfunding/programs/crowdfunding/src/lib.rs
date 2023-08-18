@@ -60,8 +60,9 @@ pub mod crowdfunding {
 }
 
 #[derive(Accounts)]
+#[instruction(name: String)]
 pub struct Create<'info> {
-    #[account(init, payer=user, space=9000, seeds=[b"CAMPAIGN_DEMO", user.key().as_ref()], bump)]
+    #[account(init, payer=user, space=9000, seeds=[b"CAMPAIGN_DEMO", user.key().as_ref(), name.as_bytes()], bump)]
     pub campaign: Account<'info, Campaign>,
 
     #[account(mut)]

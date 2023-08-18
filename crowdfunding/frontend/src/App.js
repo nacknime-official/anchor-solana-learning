@@ -61,6 +61,7 @@ function App() {
       const [campaign] = PublicKey.findProgramAddressSync([
         utils.bytes.utf8.encode("CAMPAIGN_DEMO"),
         provider.wallet.publicKey.toBytes(),
+        "campaign name",
       ], program.programId);
 
       await program.methods.create("campaign name", "campaign description").accounts({
