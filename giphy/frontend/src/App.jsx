@@ -6,6 +6,7 @@ import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import idl from "./idl.json";
 import { Buffer } from "buffer";
 import gifAccount from "./gif_account.json"
+import { BN } from 'bn.js';
 
 window.Buffer = window.Buffer || Buffer;
 
@@ -90,6 +91,22 @@ const App = () => {
     setInputValue(value);
   }
 
+  const upvote = async index => {
+    try {
+      const provider = getProvider();
+      const program = new Program(idl, programId, provider);
+
+      await program.methods.upvote(new BN(index))
+        .accounts({
+          baseGifAccount: baseGifAccount.publicKey,
+        })
+        .rpc()
+      await getGifList()
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   const renderNotConnectedContainer = () => (
     <button className='cta-button connect-wallet-button' onClick={connectWallet}>Connect to Wallet</button>
   )
@@ -117,6 +134,7 @@ const App = () => {
             {gifList.map((gif, index) => (
               <div className='gif-item' key={index}>
                 <img src={gif.link} alt={gif.link} />
+                <button onClick={() => upvote(index)}>Rating UP ({gif.rating.toString()})</button>
               </div>
             ))}
           </div>

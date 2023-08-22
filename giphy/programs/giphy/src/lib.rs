@@ -21,9 +21,20 @@ pub mod giphy {
         let gif = Gif {
             link,
             user: user.to_account_info().key(),
+            rating: 0,
         };
         base_gif_account.gif_list.push(gif);
         base_gif_account.total_gifs += 1;
+
+        Ok(())
+    }
+
+    pub fn upvote(ctx: Context<Upvote>, index: u64) -> ProgramResult {
+        let base_gif_account = &mut ctx.accounts.base_gif_account;
+
+        if let Some(gif) = base_gif_account.gif_list.get_mut(index as usize) {
+            gif.rating += 1;
+        }
 
         Ok(())
     }
@@ -46,6 +57,12 @@ pub struct AddGif<'info> {
     pub user: Signer<'info>,
 }
 
+#[derive(Accounts)]
+pub struct Upvote<'info> {
+    #[account(mut)]
+    pub base_gif_account: Account<'info, BaseGifAccount>,
+}
+
 #[account]
 pub struct BaseGifAccount {
     pub total_gifs: u64,
@@ -55,4 +72,5 @@ pub struct BaseGifAccount {
 pub struct Gif {
     pub link: String,
     pub user: Pubkey,
+    pub rating: i64,
 }

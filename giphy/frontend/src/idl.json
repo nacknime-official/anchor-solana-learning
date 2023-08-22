@@ -43,6 +43,22 @@
           "type": "string"
         }
       ]
+    },
+    {
+      "name": "upvote",
+      "accounts": [
+        {
+          "name": "baseGifAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "index",
+          "type": "u64"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -80,6 +96,10 @@
           {
             "name": "user",
             "type": "publicKey"
+          },
+          {
+            "name": "rating",
+            "type": "i64"
           }
         ]
       }
