@@ -152,8 +152,11 @@ const App = () => {
             {gifList.map((gif, index) => (
               <div className='gif-item' key={index}>
                 <img src={gif.link} alt={gif.link} />
-                <button onClick={() => upvote(index)}>Rating UP ({gif.rating.toString()})</button>
-                <button onClick={() => tip(index, gif.user)}>Tip 0.1 SOL</button>
+                <a href={`https://explorer.solana.com/address/${gif.user.toString()}?cluster=devnet`}
+                  className='footer-text'
+                >Uploaded by {gif.user.toString()}</a>
+                <button className='cta-button connect-wallet-button' onClick={() => upvote(index)}>Rating UP ({gif.rating.toString()})</button>
+                <button className='cta-button connect-wallet-button' onClick={() => tip(index, gif.user)}>Tip 0.1 SOL</button>
               </div>
             ))}
           </div>
