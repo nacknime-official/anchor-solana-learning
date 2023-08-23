@@ -38,6 +38,27 @@ pub mod giphy {
 
         Ok(())
     }
+
+    pub fn tip(ctx: Context<Tip>, index: u64, amount: u64) -> Result<()> {
+        let base_gif_account = &ctx.accounts.base_gif_account;
+        let from = &mut ctx.accounts.from;
+        let to = &mut ctx.accounts.to;
+
+        if let Some(gif) = base_gif_account.gif_list.get(index as usize) {
+            if gif.user != to.key() {
+                return err!(GiphyError::InvalidToAccountForTip);
+            }
+        }
+
+        let ix =
+            anchor_lang::solana_program::system_instruction::transfer(from.key, to.key, amount);
+        anchor_lang::solana_program::program::invoke(
+            &ix,
+            &[from.to_account_info(), to.to_account_info()],
+        )?;
+
+        Ok(())
+    }
 }
 
 #[derive(Accounts)]
@@ -63,6 +84,18 @@ pub struct Upvote<'info> {
     pub base_gif_account: Account<'info, BaseGifAccount>,
 }
 
+#[derive(Accounts)]
+pub struct Tip<'info> {
+    #[account()]
+    pub base_gif_account: Account<'info, BaseGifAccount>,
+    #[account(mut)]
+    pub from: Signer<'info>,
+    #[account(mut)]
+    /// CHECK: for transfer
+    pub to: AccountInfo<'info>,
+    pub system_program: Program<'info, System>,
+}
+
 #[account]
 pub struct BaseGifAccount {
     pub total_gifs: u64,
@@ -73,4 +106,9 @@ pub struct Gif {
     pub link: String,
     pub user: Pubkey,
     pub rating: i64,
+}
+
+#[error_code]
+pub enum GiphyError {
+    InvalidToAccountForTip,
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import twitterLogo from './assets/twitter-logo.svg';
 import './App.css';
-import { clusterApiUrl, Connection, Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
+import { clusterApiUrl, Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, SystemProgram } from '@solana/web3.js';
 import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import idl from "./idl.json";
 import { Buffer } from "buffer";
@@ -107,6 +107,24 @@ const App = () => {
     }
   }
 
+  const tip = async (index, to) => {
+    try {
+      const provider = getProvider();
+      const program = new Program(idl, programId, provider);
+
+      await program.methods.tip(new BN(index), new BN(0.1 * LAMPORTS_PER_SOL))
+        .accounts({
+          baseGifAccount: baseGifAccount.publicKey,
+          from: provider.wallet.publicKey,
+          to: to,
+        })
+        .rpc()
+      alert(`Successfully tipped to ${to.toString()}`)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   const renderNotConnectedContainer = () => (
     <button className='cta-button connect-wallet-button' onClick={connectWallet}>Connect to Wallet</button>
   )
@@ -135,6 +153,7 @@ const App = () => {
               <div className='gif-item' key={index}>
                 <img src={gif.link} alt={gif.link} />
                 <button onClick={() => upvote(index)}>Rating UP ({gif.rating.toString()})</button>
+                <button onClick={() => tip(index, gif.user)}>Tip 0.1 SOL</button>
               </div>
             ))}
           </div>
